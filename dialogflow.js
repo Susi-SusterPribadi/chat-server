@@ -7,7 +7,7 @@ const languageCode = 'id-ID';
 const sessionClient = new dialogflow.SessionsClient();
 const sessionPath = sessionClient.sessionPath(projectId, sessionId);
 
-const createRequest = queryText => ({
+const createMessage = queryText => ({
   session: sessionPath,
   queryInput: {
     text: {
@@ -17,9 +17,26 @@ const createRequest = queryText => ({
   }
 });
 
+const createEvent = (eventName, params) => ({
+  session: sessionPath,
+  queryInput: {
+    event: {
+      name: eventName,
+      parameters: { ...params },
+      languageCode
+    }
+  }
+});
+
 module.exports = {
-  sendRequest: queryText => {
-    const request = createRequest(queryText);
-    return sessionClient.detectIntent(request);
+  sendMessage: queryText => {
+    const message = createMessage(queryText);
+    console.log(queryText);
+    return sessionClient.detectIntent(message);
+  },
+  sendEvent: (eventName, params) => {
+    const event = createEvent(eventName, params);
+    console.log(event, event.queryInput.event.parameters);
+    return sessionClient.detectIntent(event);
   }
 };

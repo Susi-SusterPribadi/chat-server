@@ -13,6 +13,13 @@ const createResponseMessage = textMessage => ({
   createdAt: new Date()
 });
 
+const mapDialogflowResult = dialogflowResult => {
+  return dialogflowResult.fulfillmentMessages.map(({ text }) =>
+    createResponseMessage(text.text[0])
+  );
+};
+
 module.exports = {
-  createResponseMessage
+  createResponseMessage,
+  mapDialogflowResult
 };

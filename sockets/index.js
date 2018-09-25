@@ -1,4 +1,5 @@
 const onMessage = require('./onMessage');
+const onPrescriptionCreated = require('./onPrescriptionCreated');
 const { createResponseMessage } = require('../botResponse');
 
 const onSchedulesCreated = io => schedules => {
@@ -17,11 +18,8 @@ module.exports = io => {
       console.log(`${client.id} has disconnected.`)
     );
 
-    client.on('notification', message => {
-      io.sockets.emit('message', [createResponseMessage(message)]);
-    });
-
     client.on('message', onMessage(io));
+    client.on('prescriptionCreated', onPrescriptionCreated(io));
     client.on('schedulesCreated', onSchedulesCreated(io));
     client.on('schedulesRemind', onSchedulesRemind(io));
   });
