@@ -1,7 +1,6 @@
 const http = require('./httpCommon');
 
 const resolveResult = fulfillmentText => res => {
-  console.log('fulfillmentText', fulfillmentText);
   res.status(200).json({
     fulfillmentText
   });
@@ -17,7 +16,7 @@ const rejectResult = () => res => {
 const parseSchedule = schedules => {
   return schedules
     .map(({ prescriptionId, time }) => {
-      `${prescriptionId.label}, ${time}`;
+      return `${prescriptionId.label}, ${new Date(time).toLocaleString()}`;
     })
     .join('\n');
 };
@@ -26,12 +25,12 @@ const getSchedules = () => res => {
   http
     .get(`/chat/schedule?userId=${process.env.USER_ID}`)
     .then(({ data }) => {
-      data.length
+      data.result && data.result.length
         ? resolveResult(
-            'Kamu tidak punya jadwal untuk minum obat. Tetap jaga kesehatan kamu ya.'
+            `Kamu punya jadwal untuk minum obat:\n${parseSchedule(data.result)}`
           )(res)
         : resolveResult(
-            `Kamu punya jadwal untuk minum obat: ${parseSchedule(data)}`
+            'Kamu tidak punya jadwal untuk minum obat. Tetap jaga kesehatan kamu ya.'
           )(res);
     })
     .catch(err => {
@@ -58,7 +57,7 @@ const pendingMedication = () => res => {
     .then(({ data }) => {
       resolveResult(
         `Hm, yaudah 2 menit lagi ya.\nJadwal baru minum obat: ${parseSchedule(
-          data
+          data.result
         )}`
       )(res);
     })
@@ -83,6 +82,7 @@ module.exports = (req, res) => {
         break;
       default:
         resolveResult('Cepat sembuh ya.')(res);
+        break;
     }
   } else {
     rejectResult()(res);
