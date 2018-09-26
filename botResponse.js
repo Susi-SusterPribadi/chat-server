@@ -3,7 +3,7 @@ const uuid = require('uuid/v1');
 const chatbotProfile = {
   _id: 9999,
   name: 'Susi',
-  avatar: 'https://placeimg.com/140/140/any'
+  avatar: 'https://avatars3.githubusercontent.com/u/43376491?s=200&v=4'
 };
 
 const createResponseMessage = textMessage => ({
@@ -13,6 +13,13 @@ const createResponseMessage = textMessage => ({
   createdAt: new Date()
 });
 
+const mapDialogflowResult = dialogflowResult => {
+  return dialogflowResult.fulfillmentMessages.map(({ text }) =>
+    createResponseMessage(text.text[0])
+  );
+};
+
 module.exports = {
-  createResponseMessage
+  createResponseMessage,
+  mapDialogflowResult
 };
